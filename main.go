@@ -82,12 +82,13 @@ func main() {
 	//	fmt.Printf("Hello '%s', age: %d\n", foundPerson.name, foundPerson.age)
 	//}
 
-	factor := 0
 	wg := sync.WaitGroup{}
+	factor := 0
 	for i := 0; i < 10; i++ {
+		y := i
 		wg.Add(1)
 		go func() {
-			addWithFactor(i, i + 1, &factor)
+			addWithFactor(y, y + 1, &factor)
 			wg.Done()
 		}()
 	}
