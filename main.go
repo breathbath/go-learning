@@ -26,7 +26,7 @@ var persons = []Person{
 	},
 }
 
-var dbIsDown = false
+var dbIsDown = true
 
 type Person struct {
 	name string
@@ -36,24 +36,21 @@ type Person struct {
 func main() {
 	foundPerson, err := findPerson("Paul")
 
-	switch e := err.(type) {
-	case error2.WarningError:
-		io.OutputWarning( "", e.Error())
-	case error2.CriticalError:
-		io.OutputError(e, "", "")
-		panic(e)
-	default:
-		io.OutputError(e, "", "")
-		panic(e)
-	}
 	if err != nil {
-		io.OutputError(err, "", "")
-		if env.ReadEnv("ENV", "") == "production" {
-			sendResponseToUser("Something bad has happened to me")
-			return
+		switch e := err.(type) {
+		case error2.WarningError:
+			io.OutputWarning( "", e.Error())
+		case error2.CriticalError:
+			io.OutputError(e, "", "")
+			if env.ReadEnv("ENV", "") == "production" {
+				sendResponseToUser("Something bad has happened to me")
+				return
+			}
+			panic(e)
+		default:
+			io.OutputError(e, "", "")
+			panic(e)
 		}
-
-		return
 	}
 
 	if foundPerson == nil {
