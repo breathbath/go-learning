@@ -6,36 +6,12 @@ import (
 	"github.com/breathbath/go_utils/utils/env"
 	"github.com/breathbath/go_utils/utils/io"
 	"sync"
+	"cli/cli"
 )
 
-var persons = []Person{
-	{
-		name:    "Andrey",
-		ageRate: 220,
-	},
-	{
-		name:    "Roman",
-		ageRate: 230,
-	},
-	{
-		name:    "Ahmed",
-		ageRate: 240,
-	},
-	{
-		name:    "",
-		ageRate: 250,
-	},
-}
-
-var dbIsDown = false
-
-type Person struct {
-	name    string
-	ageRate int
-}
-
 func main() {
-	foundPerson, err := findPerson("Paul")
+	err = cli.Run()
+	//foundPerson, err := findPerson("Paul")
 
 	if err != nil {
 		switch e := err.(type) {
@@ -93,49 +69,6 @@ func main() {
 		}()
 	}
 	wg.Wait()
-}
-
-func sendResponseToUser(output string) {
-	fmt.Println(output)
-}
-
-func findPerson(name string) (person *Person, err error) {
-	io.OutputInfo("", "Trying to find person by name '%s'\n", name)
-	var dbPersons []Person
-
-	dbPersons, err = getAllPersonsFromDb()
-	if err != nil {
-		return
-	}
-
-	for _, curPerson := range dbPersons {
-		if name == curPerson.name {
-			return &curPerson, nil
-		}
-	}
-
-	return nil, nil
-}
-
-func getAllPersonsFromDb() (dbPersons []Person, err error) {
-	io.OutputInfo("", "Getting users from db")
-	if len(persons) == 0 {
-		err = error2.WarningError{
-			error2.NewErrorWrapper(fmt.Errorf("Database is empty, it has [%d] entries", len(persons))),
-		}
-		return
-	}
-
-	if dbIsDown {
-		err = error2.CriticalError{
-			error2.NewErrorWrapper(fmt.Errorf("Database is down")),
-		}
-		return
-	}
-
-	io.OutputInfo("", "Got %d users from db\n", len(persons))
-	dbPersons = persons
-	return
 }
 
 func addWithFactor(left, right int, factorPtr *int) int {
